@@ -1,83 +1,84 @@
-import tkinter as tk
-import numpy as np
-from tkinter import *
-import tkinter.messagebox as mb
-import matplotlib as mp
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.figure import Figure
-import math
-from mpl_toolkits.axisartist.parasite_axes import HostAxes,ParasiteAxes
-# from mpl_toolkits.mplot3d import Axes3D
-import qrcode
+#coding=gbk
+from wxpy import *
+import datetime
+import time
 
-class Application(tk.Frame):
-    def __init__(self, master=None):
-        tk.Frame.__init__(self, master)
-        self.pack()
-        self.createWidgets()
+Ge_name = '葛文欢'
+Msg_Num_Lim = 5
 
-    def createWidgets(self):
-        self.hi_there = tk.Button(self)
-        self.hi_there["text"] = "Hello World\n(click me)"
-        self.hi_there["command"] = self.say_hi
-        self.hi_there.pack(side="top")
+bot = Bot(console_qr = True, cache_path=True)
 
-        self.QUIT = tk.Button(self, text="QUIT", fg="red",
-                                            command=root.destroy)
-        self.QUIT.pack(side="bottom")
+# bot.file_helper.send('hello world!')
 
-    def say_hi(self):
-        print("hi there, everyone!")
+friends = bot.friends()
 
-# root = tk.Tk()
-# app = Application(master=root)
-# app.mainloop()
+friend = friends.search(Ge_name, sex=FEMALE)[0]
+Morning = datetime.datetime.strptime(str(datetime.datetime.now().date()) + '7:40', '%Y-%m-%d%H:%M')
+Night = datetime.datetime.strptime(str(datetime.datetime.now().date()) + '23:00', '%Y-%m-%d%H:%M')
+Msg_Cnt = 0
+old_m = now_m = 0
+# 回复 my_friend 的消息 (优先匹配后注册的函数!)
+@bot.register(friend)
+def reply_my_friend(msg):
+    global Msg_Cnt
+    global old_m, now_m
+    now_time = datetime.datetime.utcnow() + datetime.timedelta(hours = 8)
+    now_m = now_time.minute
+    if now_m == old_m:
+        Msg_Cnt = Msg_Cnt + 1
+    else:
+        Msg_Cnt = 0
+        old_m = now_m
 
-def d3():
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
-    y = np.linspace(0,1.2,12)
-    x = np.ones(y.size)
-    K = 7
-    X = np.linspace(0.1,1.8,50)
-    Y = np.linspace(0.5,1.5,50) 
-    X,Y = np.meshgrid(X,Y)
-    # Z = K*X/sqrt((1/X-K*X-X)**2 + (Y*K-Y*X**2*K)**2)
-    Z = K*X/np.sqrt((1/X-K*X-X)**2 + (Y*K-Y*X**2*K)**2)
-    # print(Z)
-    ax.plot_surface(X,Y,Z,color = 'r',alpha = 0.5,antialiased=False)
-    
-    X = np.linspace(0.45,1.3,40)
-    Y = np.linspace(0.5,1.3,50) 
-    X,Y = np.meshgrid(X,Y)
-    Z = K*X/np.sqrt((1/X-K*X-X)**2 + (Y*K-Y*X**2*K)**2)
-    ax.plot_surface(X,Y,Z,color = 'g',alpha = 0.5,antialiased=False)
-    plt.show()
-    
-def Gain(w):
-    return 1/(1 + w*1j)
-def LOG(x):
-    return 20*math.log(x,10)
-def Angle(w):
-    return 1/(1 + w*1j)
-    
-def bode():
-    x = np.linspace(0.01,1e6,100)
-    print(20*np.log(np.abs(Gain(x)),10))
-    # plt.plot(x,1/x)
-    plt.plot(x,20*np.log(np.abs(Gain(x)),10))
-    plt.xscale('log')
-    plt.yscale('log')
-    plt.title("Amp")
-    
-    plt.show()
-def qr():
-    img = qrcode.make("http://www.baoan-marathon.com/")
-    img.save("test.png")
+    if msg.text.__contains__('下班'): 
+        return "好的，早点回去吧。"
+    if Msg_Cnt < Msg_Num_Lim:
+        if Msg_Cnt == Msg_Num_Lim - 1:
+            msg.reply(" 废话太多， 不想说了， 88..." )
+        else:
+            msg.reply("狗屎刚才说： " + msg.text)
+    else:
+        Msg_Cnt = Msg_Num_Lim
+
+#     return 'received: {} ({})'.format(msg.text, msg.type)
+
+# @bot.register(bot.self, except_self=False)
+# def reply_self(msg):
+#     print(msg.text)
+#     global Msg_Cnt
+#     global old_m, now_m
+#     now_time = datetime.datetime.utcnow() + datetime.timedelta(hours = 8)
+#     now_m = now_time.minute
+#     if now_m == old_m:
+#         Msg_Cnt = Msg_Cnt + 1
+#         print("Msg_Cntif: " + str(Msg_Cnt))
+#     else:
+#         Msg_Cnt = 0
+#         old_m = now_m
+#         print("Msg_Cntelse: " + str(Msg_Cnt))
+#     if Msg_Cnt < Msg_Num_Lim:
+#         msg.reply("狗屎刚才说： " + msg.text)
+#     else:
+#         Msg_Cnt = Msg_Num_Lim
+# bot.join()
+# bot.self.send("test")
+
 if __name__ == '__main__':
-    # d3()
-    bode()
-    # qr()
+    while True:
+#         now_time = datetime.datetime.now()
+        now_time = datetime.datetime.utcnow() + datetime.timedelta(hours = 8)
+        now_h = now_time.hour
+        now_m = now_time.minute
+#         print(now_m)
+        if Morning.hour == now_h and Morning.minute == now_m:
+            friend.send('早上好！')
+        if Night.hour == now_h and Night.minute == now_m:
+            friend.send('晚上好！')
+#         bot.self.send("test")
+        time.sleep(50)
+         
+    bot.join()
+             
+    pass
     
 
