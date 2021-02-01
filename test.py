@@ -6,13 +6,14 @@ import time
 Ge_name = '¸ðÎÄ»¶'
 Msg_Num_Lim = 2
 
-bot = Bot(console_qr = True, cache_path=True)
+# bot = Bot(console_qr = True, cache_path=True, qr_path = "/var/www/wxqr/qr.png")
+bot = Bot(qr_path = "/var/www/wxqr/qr.png")
 
 # bot.file_helper.send('hello world!')
 
 friends = bot.friends()
 groups = bot.groups()
-LOL = groups.search("LOL")[0]
+LOL = groups.search("Lol")[0]
 
 friend = friends.search(Ge_name, sex=FEMALE)[0]
 Morning = datetime.datetime.strptime(str(datetime.datetime.now().date()) + '7:40', '%Y-%m-%d%H:%M')
