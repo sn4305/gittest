@@ -7,7 +7,7 @@ Ge_name = '¸ðÎÄ»¶'
 Msg_Num_Lim = 2
 
 # bot = Bot(console_qr = True, cache_path=True, qr_path = "/var/www/wxqr/qr.png")
-bot = Bot(qr_path = "/var/www/wxqr/qr.png")
+bot = Bot(qr_path = "/var/www/html/wxqr/qr.png")
 
 # bot.file_helper.send('hello world!')
 
