@@ -83,6 +83,29 @@ def reply_LOL(msg):
         else:
             Msg_Cnt = Msg_Num_Lim
 
+@bot.register()
+def reply_all(msg):
+    global Msg_Cnt
+    global old_m, now_m , AutoReplyFlag
+
+    if AutoReplyFlag:
+        now_time = datetime.datetime.utcnow() + datetime.timedelta(hours = 8)
+        now_m = now_time.minute
+        if now_m == old_m:
+            Msg_Cnt = Msg_Cnt + 1
+        else:
+            Msg_Cnt = 0
+            old_m = now_m
+        
+        if Msg_Cnt < Msg_Num_Lim:
+            if msg.text.__contains__('新年快乐') : 
+                return "新年快乐！"
+            elif msg.text.__contains__('除夕快乐') : 
+                return "除夕快乐！"
+
+        else:
+            Msg_Cnt = Msg_Num_Lim
+
 #     return 'received: {} ({})'.format(msg.text, msg.type)
 
 # @bot.register(bot.self, except_self=False)
